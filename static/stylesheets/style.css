@@ -460,7 +460,7 @@ p.card-bio {
 }
 
 #home-aside .stat h4 {
-  text-align: left;
+  text-align: center;
 }
 
 /* ========================== Signup/Login */
@@ -468,7 +468,7 @@ p.card-bio {
 #user_form input.form-control {
   font-size: 18px;
   font-weight: bold;
-  padding: 12px;
+  /* padding: 12px; */
 }
 
 /* =========================== Edit Page */

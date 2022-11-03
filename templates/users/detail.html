@@ -12,7 +12,7 @@
           <li class="stat">
             <p class="small">Messages</p>
             <h4>
-              <a href="/users/{{ user.id }}">{{ user.messages | length }}</a>
+              <a id="detailMsgCount" href="/users/{{ user.id }}">{{ user.messages | length }}</a>
             </h4>
           </li>
           <li class="stat">
@@ -29,13 +29,15 @@
           </li>
           <li class="stat">
             <p class="small">Likes</p>
-            <h4>TBD</h4>
+            <h4>
+              <a href="/users/{{ user.id }}/likes">{{ user.likes | length }}</a>
+            </h4>
           </li>
           <div class="ml-auto">
             {% if g.user.id == user.id %}
             <a href="/users/profile" class="btn btn-outline-secondary">Edit Profile</a>
             <form method="POST" action="/users/delete" class="form-inline">
-              <button class="btn btn-outline-danger ml-2">Delete Profile</button>
+              <button class="btn btn-outline-danger ms-2">Delete Profile</button>
             </form>
             {% elif g.user %}
             {% if g.user.is_following(user) %}
@@ -56,10 +58,10 @@
 </div>
 
 <div class="row">
-  <div class="col-sm-3">
-    <h4 id="sidebar-username">@{{ user.username }}</h4>
+  <div class="col-sm-12 col-md-3">
+    <h4 id="sidebar-username" data-id="{{ user.id }}">@{{ user.username }}</h4>
     <p>{{ user.bio }}</p>
-    <p class="user-location"><span class="fa fa-map-marker"></span>{{ user.location }}</p>
+    <p class="user-location"><span class="fa fa-map-marker me-2"></span>{{ user.location }}</p>
   </div>
 
   {% block user_details %}

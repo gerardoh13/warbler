@@ -2,12 +2,27 @@
 
 from datetime import datetime
 
+from sqlalchemy.sql import expression
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import DateTime
+
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
+class utcnow(expression.FunctionElement):
+    type = DateTime()
+    inherit_cache = True
+
+@compiles(utcnow, 'postgresql')
+def pg_utcnow(element, compiler, **kw):
+    return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
+
+@compiles(utcnow, 'mssql')
+def ms_utcnow(element, compiler, **kw):
+    return "GETUTCDATE()"
 
 class Follows(db.Model):
     """Connection of a follower <-> followed_user."""
@@ -188,7 +203,7 @@ class Message(db.Model):
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow(),
+        server_default=utcnow()
     )
 
     user_id = db.Column(
@@ -198,6 +213,22 @@ class Message(db.Model):
     )
 
     user = db.relationship('User')
+
+    def __repr__(self):
+        return f"<Message #{self.id}: {self.text}, {self.timestamp}, {self.user_id}>"
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime('%d %B %Y'),
+            "user": {
+                "id": self.user.id,
+                "image_url": self.user.image_url,
+                "username": self.user.username
+            }
+        }
 
 
 def connect_db(app):
