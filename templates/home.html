@@ -18,7 +18,7 @@
           <li class="stat">
             <p class="small">Messages</p>
             <h4>
-              <a id="homeMsgCount" href="/users/{{ g.user.id }}"
+              <a id="msgCount" href="/users/{{ g.user.id }}"
                 >{{ g.user.messages | length }}</a
               >
             </h4>
@@ -42,7 +42,7 @@
           <li class="stat">
             <p class="small">Likes</p>
             <h4>
-              <a href="/users/{{ g.user.id }}/likes"
+              <a id="likeCount" href="/users/{{ g.user.id }}/likes"
                 >{{ g.user.likes | length }}</a
               >
             </h4>
@@ -68,13 +68,9 @@
           <p class="mt-2">{{ msg.text }}</p>
         </div>
         {% if msg.user_id != g.user.id %}
-        <form
-          method="POST"
-          action="/messages/{{ msg.id }}/like"
-          id="messages-form"
-          class="me-1 mt-1"
-        >
+        <div class="messages-form">
           <button
+          data-id="{{ msg.id }}"
             class="
                 btn 
                 btn-sm 
@@ -82,7 +78,7 @@
           >
             <i class="fa fa-thumbs-up"></i>
           </button>
-        </form>
+        </div>
         {% endif %}
       </li>
       {% endfor %}

@@ -47,7 +47,7 @@
           <li><a href="/signup">Sign up</a></li>
           <li><a href="/login">Log in</a></li>
           {% else %}
-          <li>
+          <li id="profileLink" data-id="{{ g.user.id }}">
             <a href="/users/{{ g.user.id }}">
               <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}" />
             </a>
@@ -91,6 +91,7 @@
                   rows="3"
                   class="form-control"
                   required
+                  placeholder="What's happening?"
                 ></textarea>
                 <div class="invalid-feedback">Message cannot be blank.</div>
                 <div class="float-end">

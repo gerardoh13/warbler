@@ -144,7 +144,7 @@ def list_users():
     if not search:
         users = User.query.all()
     else:
-        users = User.query.filter(User.username.like(f"%{search}%")).all()
+        users = User.query.filter(User.username.ilike(f"%{search}%")).all()
 
     return render_template('users/index.html', users=users)
 
@@ -157,13 +157,14 @@ def users_show(user_id):
 
     # snagging messages in order from the database;
     # user.messages won't be in order by default
+    like_ids = [like.id for like in g.user.likes]
     messages = (Message
                 .query
                 .filter(Message.user_id == user_id)
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+    return render_template('users/show.html', user=user, messages=messages, likes=like_ids)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -229,6 +230,25 @@ def like_message(msg_id):
     db.session.commit()
 
     return redirect("/")
+
+@app.route('/api/messages/like', methods=['POST'])
+@login_required
+def like_message_api():
+    """endpoint to toggle like for selected message"""
+    liked_msg = Message.query.get_or_404(request.json["msg_id"])
+    if liked_msg.user_id == g.user.id:
+        return abort(403)
+    user_likes = g.user.likes
+    if liked_msg in user_likes:
+        g.user.likes = [like for like in user_likes if like != liked_msg]
+        response_json = jsonify(message="unliked")
+
+    else:
+        g.user.likes.append(liked_msg)
+        response_json = jsonify(message="liked")
+    db.session.commit()
+    
+    return (response_json, 200)
 
 
 @app.route('/users/profile', methods=["GET", "POST"])

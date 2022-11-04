@@ -20,6 +20,10 @@ body.error-404 {
   cursor: pointer;
 }
 
+button > * {
+  pointer-events: none;
+}
+
 /* ======================= Nav */
 
 .navbar {
@@ -194,6 +198,7 @@ nav + .container {
 
 .message-area {
   margin-left: 10px;
+  padding-right: 5px;
 }
 
 #warbler-hero {
@@ -269,6 +274,11 @@ nav + .container {
 }
 
 #messages .list-group-item a:not(.message-link) {
+  position: relative;
+  z-index: 2;
+}
+
+#messages .list-group-item button {
   position: relative;
   z-index: 2;
 }
@@ -508,10 +518,10 @@ p.card-bio {
   min-width: 105px;
 }
 
-#messages-form {
+.messages-form {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 8px;
+  right: 8px;
   z-index: 1;
 }
 

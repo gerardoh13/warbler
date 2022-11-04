@@ -12,7 +12,7 @@
           <li class="stat">
             <p class="small">Messages</p>
             <h4>
-              <a id="detailMsgCount" href="/users/{{ user.id }}">{{ user.messages | length }}</a>
+              <a id="msgCount" href="/users/{{ user.id }}">{{ user.messages | length }}</a>
             </h4>
           </li>
           <li class="stat">
@@ -30,7 +30,7 @@
           <li class="stat">
             <p class="small">Likes</p>
             <h4>
-              <a href="/users/{{ user.id }}/likes">{{ user.likes | length }}</a>
+              <a id="likeCount" href="/users/{{ user.id }}/likes">{{ user.likes | length }}</a>
             </h4>
           </li>
           <div class="ml-auto">

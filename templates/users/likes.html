@@ -21,16 +21,12 @@
         >
         <p>{{ like.text }}</p>
       </div>
-      <form
-        method="POST"
-        action="/messages/{{ like.id }}/like"
-        id="messages-form"
-        class="me-2 mt-2"
-      >
-        <button class="btn btn-sm btn-primary">
+
+      <div class="messages-form">
+        <button class="btn btn-sm btn-primary" data-id="{{ like.id }}">
           <i class="fa fa-thumbs-up"></i>
         </button>
-      </form>
+      </div>
     </li>
 
     {% endfor %}
