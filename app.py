@@ -126,9 +126,6 @@ def logout():
     do_logout()
     return redirect("/")
 
-    # IMPLEMENT THIS
-
-
 ##############################################################################
 # General user routes:
 
@@ -148,7 +145,6 @@ def list_users():
 
     return render_template('users/index.html', users=users)
 
-
 @app.route('/users/<int:user_id>')
 def users_show(user_id):
     """Show user profile."""
@@ -157,15 +153,17 @@ def users_show(user_id):
 
     # snagging messages in order from the database;
     # user.messages won't be in order by default
-    like_ids = [like.id for like in g.user.likes]
+    if g.user:
+        likes = [like.id for like in g.user.likes]
+    else:
+        likes = []
     messages = (Message
                 .query
                 .filter(Message.user_id == user_id)
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages, likes=like_ids)
-
+    return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 @app.route('/users/<int:user_id>/following')
 @login_required
@@ -175,7 +173,6 @@ def show_following(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/following.html', user=user)
 
-
 @app.route('/users/<int:user_id>/followers')
 @login_required
 def users_followers(user_id):
@@ -184,18 +181,18 @@ def users_followers(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
 
-
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
 @login_required
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
 
     followed_user = User.query.get_or_404(follow_id)
+    if followed_user.id == g.user.id:
+        return abort(403)
     g.user.following.append(followed_user)
     db.session.commit()
 
     return redirect(f"/users/{g.user.id}/following")
-
 
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
 @login_required
@@ -214,42 +211,6 @@ def show_likes(user_id):
     """Show list of messages this user has liked."""
     user = User.query.get_or_404(user_id)
     return render_template('users/likes.html', user=user)
-
-@app.route('/messages/<int:msg_id>/like', methods=['POST'])
-@login_required
-def like_message(msg_id):
-    """toggles like for selected message"""
-    liked_msg = Message.query.get_or_404(msg_id)
-    if liked_msg.user_id == g.user.id:
-        return abort(403)
-    user_likes = g.user.likes
-    if liked_msg in user_likes:
-        g.user.likes = [like for like in user_likes if like != liked_msg]
-    else:
-        g.user.likes.append(liked_msg)
-    db.session.commit()
-
-    return redirect("/")
-
-@app.route('/api/messages/like', methods=['POST'])
-@login_required
-def like_message_api():
-    """endpoint to toggle like for selected message"""
-    liked_msg = Message.query.get_or_404(request.json["msg_id"])
-    if liked_msg.user_id == g.user.id:
-        return abort(403)
-    user_likes = g.user.likes
-    if liked_msg in user_likes:
-        g.user.likes = [like for like in user_likes if like != liked_msg]
-        response_json = jsonify(message="unliked")
-
-    else:
-        g.user.likes.append(liked_msg)
-        response_json = jsonify(message="liked")
-    db.session.commit()
-    
-    return (response_json, 200)
-
 
 @app.route('/users/profile', methods=["GET", "POST"])
 @login_required
@@ -280,7 +241,6 @@ def profile():
 
     return render_template("users/edit.html", form=form, user_id=user.id)
 
-
 @app.route('/users/delete', methods=["POST"])
 @login_required
 def delete_user():
@@ -292,7 +252,6 @@ def delete_user():
     db.session.commit()
 
     return redirect("/signup")
-
 
 ##############################################################################
 # Messages routes:
@@ -329,9 +288,43 @@ def messages_add_api():
 def messages_show(message_id):
     """Show a message."""
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
     return render_template('messages/show.html', message=msg)
 
+@app.route('/messages/<int:msg_id>/like', methods=['POST'])
+@login_required
+def like_message(msg_id):
+    """toggles like for selected message"""
+    liked_msg = Message.query.get_or_404(msg_id)
+    if liked_msg.user_id == g.user.id:
+        return abort(403)
+    user_likes = g.user.likes
+    if liked_msg in user_likes:
+        g.user.likes = [like for like in user_likes if like != liked_msg]
+    else:
+        g.user.likes.append(liked_msg)
+    db.session.commit()
+
+    return redirect("/")
+
+@app.route('/api/messages/like', methods=['POST'])
+@login_required
+def like_message_api():
+    """endpoint to toggle like for selected message"""
+    liked_msg = Message.query.get_or_404(request.json["msg_id"])
+    if liked_msg.user_id == g.user.id:
+        return abort(403)
+    user_likes = g.user.likes
+    if liked_msg in user_likes:
+        g.user.likes = [like for like in user_likes if like != liked_msg]
+        response_json = jsonify(message="unliked")
+
+    else:
+        g.user.likes.append(liked_msg)
+        response_json = jsonify(message="liked")
+    db.session.commit()
+    
+    return (response_json, 200)
 
 @app.route('/messages/<int:message_id>/delete', methods=["POST"])
 def messages_destroy(message_id):
@@ -348,7 +341,6 @@ def messages_destroy(message_id):
 
 ##############################################################################
 # Homepage and error pages
-
 
 @app.route('/')
 def homepage():

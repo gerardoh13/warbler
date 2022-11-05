@@ -216,7 +216,7 @@ class Message(db.Model):
     user = db.relationship('User', overlaps="messages")
 
     def __repr__(self):
-        return f"<Message #{self.id}: {self.text}, {self.timestamp}, {self.user_id}>"
+        return f"<Message #{self.id}: {self.text}, User#{self.user_id}>"
 
     def serialize(self):
         return {

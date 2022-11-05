@@ -17,6 +17,7 @@
             <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
             <p>{{ msg.text }}</p>
           </div>
+          {% if g.user %}
           {% if msg.user_id != g.user.id %}
           <div class="messages-form">
             <button
@@ -29,6 +30,7 @@
               <i class="fa fa-thumbs-up"></i>
             </button>
           </div>
+          {% endif %}
           {% endif %}
         </li>
 
