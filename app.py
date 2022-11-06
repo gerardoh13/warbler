@@ -219,6 +219,10 @@ def profile():
     user = g.user
 
     form = UserEditForm(obj=user)
+    if form.image_url.data == "/static/images/default-pic.png":
+        form.image_url.data = None
+    if form.header_image_url.data == "/static/images/warbler-hero.jpg":
+        form.header_image_url.data = None
     if form.validate_on_submit():
         if User.authenticate(user.username, form.password.data):
             user.username = form.username.data.strip()
